@@ -179,10 +179,23 @@ if source_image is not None:
             audio_file_path = get_audio_filename(identified_letter)
             
             if audio_file_path and os.path.exists(audio_file_path):
-                # Use autoplay=True for automatic playback
-                st.audio(audio_file_path, format="audio/mp4", start_time=0, autoplay=True) 
+                # نقرأ الصوت ونحوله Base64
+                with open(audio_file_path, "rb") as f:
+                    audio_bytes = f.read()
+                audio_base64 = base64.b64encode(audio_bytes).decode()
+            
+                # عنصر HTML يشغل الصوت تلقائيًا (فعليًا)
+                audio_html = f"""
+                    <audio autoplay>
+                        <source src="data:audio/mp4;base64,{audio_base64}" type="audio/mp4">
+                        متصفحك لا يدعم تشغيل الصوت.
+                    </audio>
+                """
+                st.markdown(audio_html, unsafe_allow_html=True)
+            
             else:
                 st.warning(f"⚠️ لم يتم العثور على الملف الصوتي للحرف '{identified_letter}' في مجلد الأصوات.")
+
 
 else:
     st.info("يرجى رفع أو التقاط صورة للحرف العربي للبدء في عملية المقارنة الآلية.")
